@@ -1,0 +1,36 @@
+---
+image: 
+  name: tamimhemat/tamim-image:latest
+  pull_policy: if-not-present
+
+stages:
+- ".pre"
+- all
+- zip_artifacts
+- ".post"
+
+.build_template: &build_definition
+  - pip install -r requirements.txt
+
+.pythonlint_template: &pythonlint_definition
+  - pylint --fail-under=5.0 *.py
+
+.testcoverage_template: &testcoverage_definition
+  - chmod +x testing.sh
+  - ./testing.sh
+
+
+all:
+  stage: all
+  script:
+    - *build_definition
+    - *pythonlint_definition
+    - *testcoverage_definition
+
+zip_artifacts:
+  stage: zip_artifacts
+  script:
+  - zip app.zip *.py
+  artifacts:
+    paths:
+    - app.zip
